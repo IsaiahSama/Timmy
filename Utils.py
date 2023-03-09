@@ -77,13 +77,14 @@ def tts(text:str):
     engine = pyttsx3.init()
 
     # Set the voice
-    engine.setProperty('voice', "./voice.flitevox")
+    voices = engine.getProperty("voices")
+    engine.setProperty('voice', voices[1].id) 
+    engine.runAndWait()
 
     # Set the rate
-    engine.setProperty('rate', 170) # you can adjust this value as needed
-
+    engine.setProperty('rate', 150)
     # Set the volume
-    engine.setProperty('volume', 1.0) # you can adjust this value as needed
+    engine.setProperty('volume', 1.0)
 
     # Say something
     engine.say(text)

@@ -4,7 +4,7 @@ import Utils
 # Step 1, Run the program
 
 # Step 2, record x seconds worth of audio
-rc = Utils.Recorder(3)
+rc = Utils.Recorder(5)
 
 frames = rc.record()
 
