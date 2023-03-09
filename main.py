@@ -12,6 +12,7 @@ frames = rc.record()
 rc.save_frames(frames)
 
 # Step 4, transcribe the audio from the file to text
+text = Utils.transcribe()
 
 # Step 5, pass the text to the AI
 

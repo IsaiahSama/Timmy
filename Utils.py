@@ -9,6 +9,9 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Gotta store the filename
+filename = "output.wav"
+
 # First we need a class to handle recording the audio
 class Recorder:
     # Set the properties for the class
@@ -16,11 +19,12 @@ class Recorder:
     channels = 2
     sample_rate = 44100
     record_seconds = 0
-    filename = "output.wav"
+    
 
     # Initilalize the number of seconds to record
-    def __init__(self, record_seconds=10):
+    def __init__(self, record_seconds=5):
         self.record_seconds = record_seconds
+        self.filename = filename
 
     def record(self) -> list:
         """This function will record record_seconds number of seconds worth of audio"""
@@ -50,4 +54,9 @@ class Recorder:
         wf.writeframes(b''.join(frames))
         wf.close()
 
-# class Transcriber:
+# This method is used to transcribe information from the specified filename
+
+def transcribe():
+    with open(filename, 'rb') as fp:
+        transcript = openai.Audio.transcribe("whisper-1", fp)
+        return transcript['text']
