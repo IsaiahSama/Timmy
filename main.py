@@ -5,6 +5,9 @@ import Utils
 
 text = ""
 
+r = Utils.prompt("Introduce yourself.")
+Utils.tts(r)
+
 while ("goodbye" not in text.lower()):
     # Step 2, record x seconds worth of audio
     rc = Utils.Recorder(5)
