@@ -19,10 +19,10 @@ while ("goodbye" not in text.lower()):
 
     # Step 4, transcribe the audio from the file to text
     text = Utils.transcribe()
+    if not text or "timmy" not in text.lower(): continue
     print("I heard: ", text)
 
     # Step 5, pass the text to the AI if there is text
-    if not text: continue
     # Step 6, let the magic happen
     # Step 7, save the response
     response = Utils.prompt(text)
