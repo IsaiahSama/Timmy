@@ -88,5 +88,8 @@ def tts(text:str):
 
     # Say something
     print(text)
-    engine.say(text)
+    engine.say(clean_up_text_for_speech(text))
     engine.runAndWait()
+
+def clean_up_text_for_speech(text:str):
+    return text.replace(" | ", "...")
