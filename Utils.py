@@ -60,3 +60,10 @@ def transcribe():
     with open(filename, 'rb') as fp:
         transcript = openai.Audio.transcribe("whisper-1", fp)
         return transcript['text']
+
+
+def prompt(text:str):
+    p = "You are role-playing as an amazing assistant to help someone who is often confused. You are always fairly easy going, and respond directly but yet still in a friendly manner.\n" + text
+    response = openai.Completion.create(model="text-davinci-003", prompt=p, temperature=1, max_tokens=100)
+
+    return response["choices"][0]["text"]
