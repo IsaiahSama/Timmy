@@ -26,5 +26,4 @@ while ("goodbye" not in text.lower()):
 
     # Step 8, Read out the response.
 
-    print(response)
     Utils.tts(response)

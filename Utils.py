@@ -87,5 +87,6 @@ def tts(text:str):
     engine.setProperty('volume', 1.0)
 
     # Say something
+    print(text)
     engine.say(text)
     engine.runAndWait()
