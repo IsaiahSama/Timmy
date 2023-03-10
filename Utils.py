@@ -78,11 +78,11 @@ def tts(text:str):
 
     # Set the voice
     voices = engine.getProperty("voices")
-    engine.setProperty('voice', voices[1].id) 
+    engine.setProperty('voice', voices[0].id) 
     engine.runAndWait()
 
     # Set the rate
-    engine.setProperty('rate', 150)
+    engine.setProperty('rate', 160)
     # Set the volume
     engine.setProperty('volume', 1.0)
 
@@ -92,4 +92,4 @@ def tts(text:str):
     engine.runAndWait()
 
 def clean_up_text_for_speech(text:str):
-    return text.replace(" | ", "...")
+    return text.replace("|", ".")
