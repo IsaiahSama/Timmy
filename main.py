@@ -9,12 +9,13 @@ prev_text = ""
 r = Utils.prompt("Introduce yourself.")
 Utils.tts(r)
 
-filler = "<Everything before this is just for context of past conversations. So don't respond to it>"
+FILLER = "Only respond to everything after this sentence."
+CLEAR = "clear conversation history"
 
 while ("goodbye" not in text.lower()):
     # Step 2, record x seconds worth of audio
-    prev_text = prev_text.replace(filler, "")
-    rc = Utils.Recorder(5)
+    prev_text = prev_text.replace(FILLER, "")
+    rc = Utils.Recorder(7)
 
     frames = rc.record()
 
@@ -24,8 +25,12 @@ while ("goodbye" not in text.lower()):
     # Step 4, transcribe the audio from the file to text
     text = Utils.transcribe()
     if not text or "timmy" not in text.lower(): continue
+    if CLEAR in text.lower(): 
+        prev_text = ""
+        text = text.replace(CLEAR, "")
+        
     print("I heard: ", text)
-    prev_text += ". "+ filler + text
+    prev_text += ". "+ FILLER + text
     if len(prev_text) >= 1500: prev_text = ""
 
     # Step 5, pass the text to the AI if there is text
