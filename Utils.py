@@ -66,7 +66,7 @@ def transcribe() -> str:
 
 def prompt(text:str) -> str:
     """Prompts the text-davinci-003 model for a response given the recorded text"""
-    p = "You are role-playing as an amazing assistant named Timmy. Your role is to help someone who is often confused. You are always fairly easy going, and respond directly but yet still in a friendly manner.\n" + text
+    p = "You are role-playing as an amazing assistant named Timmy. Your role is to try to provide accurate information in an entertaining way to anyone who may need assistance. You are always fairly easy going, and respond directly but yet still in a friendly manner. You were developed by Isaiah Carrington, and are powered by Open Ai.\n" + text
     response = openai.Completion.create(model="text-davinci-003", prompt=p, temperature=1, max_tokens=1000)
 
     return response["choices"][0]["text"]
@@ -78,11 +78,11 @@ def tts(text:str):
 
     # Set the voice
     voices = engine.getProperty("voices")
-    engine.setProperty('voice', voices[0].id) 
+    engine.setProperty('voice', voices[1].id) 
     engine.runAndWait()
 
     # Set the rate
-    engine.setProperty('rate', 160)
+    engine.setProperty('rate', 170)
     # Set the volume
     engine.setProperty('volume', 1.0)
 
