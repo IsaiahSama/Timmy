@@ -8,6 +8,8 @@ from openai.error import Timeout, RateLimitError
 from dotenv import load_dotenv
 from keyboard import is_pressed
 
+testing = True
+
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -36,7 +38,7 @@ class Recorder:
         stream = audio.open(format=pyaudio.paInt16, channels=self.channels, rate=self.sample_rate, input=True, frames_per_buffer=self.chunk)
         
         frames = []
-        print("I'm listening")
+        tts("I'm listening")
 
         # for i in range(0, int(self.sample_rate / self.chunk * self.record_seconds)):
         while not (is_pressed("c")):
@@ -74,33 +76,42 @@ def transcribe() -> str:
 def prompt(context:list) -> str:
     """Prompts the text-davinci-003 model for a response given the recorded text"""
     content = "CONTEXT:\n"+ "\n".join(context[1:-1]) + "\nQUERY:\n" + context[-1]
-    print(content)
     try:
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{
-                    "role":context[0],
-                    "content":content,
-                }], 
-                temperature=1,
-                request_timeout=10
+        if not testing:
+            response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role":'system', "content":context[0]},
+                        {"role":'user', "content":content},
+                        ], 
+                    temperature=1,
+                    request_timeout=20
+                )
+            print(content)
 
-            )
+        else:
+            raise Timeout
+    
     except (Timeout, RateLimitError):
         try:
             print("The ChatCompletion model is occupied. Trying Completion model.")
+            temp = content.split('\n')
+            temp.insert(1, context[0])
+            content = '\n'.join(temp)
             response = openai.Completion.create(
                 model="text-davinci-003", 
                 prompt=content, 
                 temperature=1,
-                request_timeout=10
+                request_timeout=40,
+                max_tokens=1000
                 )
+            print(content)
         except (RateLimitError):
             tts("My brain seems to be occupied doing other things. Very busy I am. Sorry. Try again later.")
         except (Timeout):
             tts("The wifi you're currently connected to is not good enough and the requests are taking too long.")
 
-    return response["choices"][0]['text'].replace("RESPONSE:", "")
+    return response["choices"][0]['text'].replace("ANSWER:", "").replace("RESPONSE:", "")
 
 
 def tts(text:str):
@@ -121,6 +132,7 @@ def tts(text:str):
     print(text)
     engine.say(clean_up_text_for_speech(text))
     engine.runAndWait()
+    print()
 
 def clean_up_text_for_speech(text:str):
     return text.replace("|", ".").replace("-", "")

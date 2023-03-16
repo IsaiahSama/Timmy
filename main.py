@@ -3,18 +3,20 @@ import Utils
 from keyboard import add_hotkey, wait
 from time import sleep
 
-# Step 1, Run the program and LOOP!
+GENERAL = "You are role-playing as an amazing assistant named Timmy. Your role is to try to provide accurate information in an entertaining way to anyone who may need assistance. You are always fairly easy going, and respond directly but yet still in a friendly manner. You were developed by Isaiah Carrington, and are powered by Open Ai."
+CHILD = "You are a person at a stall, dealing with children. Your name is Timmy. Respond using humor and be sure to express your love for them. Sometimes what they say won't make sense because of audio issues, but try your best!"
+roles = [GENERAL, CHILD]
 
-role = "assistant"
 DEFAULT_CONTEXT = [
-    role,
-    "You are role-playing as an amazing assistant named Timmy. Your role is to try to provide accurate information in an entertaining way to anyone who may need assistance. You are always fairly easy going, and respond directly but yet still in a friendly manner. You were developed by Isaiah Carrington, and are powered by Open Ai. You will only respond to anything under the 'QUERY:' header."
+    roles[0] + "Your will only respond to anything under the 'QUERY:' header."
     ]
-context = DEFAULT_CONTEXT[:]
 
+context = DEFAULT_CONTEXT[:]
 
 FILLER = "Only respond to everything after this sentence."
 CLEAR = "Clear conversation history"
+
+
 
 class Timmy:
     text = ""
@@ -64,7 +66,7 @@ if __name__ == "__main__":
     running = True
     timmy = Timmy()
 
-    Utils.tts(Utils.prompt([*context, "Introduce yourself"]))
+    # Utils.tts(Utils.prompt([*context, "Introduce yourself"]))
 
     while running:
         wait('x')
