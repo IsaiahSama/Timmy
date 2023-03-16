@@ -9,3 +9,5 @@ CONFIG:
     CHATCOMPLETION: "chat"
     TEXTCOMPLETION: "text"
   MODEL: CHATCOMPLETION
+  RECORDKEY: x # Key to press to begin recording.
+  PROCESSKEY: c # Key to press to stop recording.
