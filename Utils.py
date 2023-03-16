@@ -3,6 +3,8 @@
 import pyaudio, wave, pyttsx3
 import openai, os
 
+from openai.error import Timeout, RateLimitError
+
 from dotenv import load_dotenv
 from keyboard import is_pressed
 
@@ -63,6 +65,7 @@ class Recorder:
 
 def transcribe() -> str:
     """Transcribes the audio file into text"""
+    print("Thinking about how to respond...")
     with open(filename, 'rb') as fp:
         transcript = openai.Audio.transcribe("whisper-1", fp)
         return transcript['text'].strip()
@@ -72,16 +75,32 @@ def prompt(context:list) -> str:
     """Prompts the text-davinci-003 model for a response given the recorded text"""
     content = "CONTEXT:\n"+ "\n".join(context[1:-1]) + "\nQUERY:\n" + context[-1]
     print(content)
-    response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{
-                "role":context[0],
-                "content":content,
-            }], 
-            temperature=1,
-        )
+    try:
+        response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{
+                    "role":context[0],
+                    "content":content,
+                }], 
+                temperature=1,
+                request_timeout=10
 
-    return response["choices"][0]["message"]['content'].replace("RESPONSE:", "")
+            )
+    except (Timeout, RateLimitError):
+        try:
+            print("The ChatCompletion model is occupied. Trying Completion model.")
+            response = openai.Completion.create(
+                model="text-davinci-003", 
+                prompt=content, 
+                temperature=1,
+                request_timeout=10
+                )
+        except (RateLimitError):
+            tts("My brain seems to be occupied doing other things. Very busy I am. Sorry. Try again later.")
+        except (Timeout):
+            tts("The wifi you're currently connected to is not good enough and the requests are taking too long.")
+
+    return response["choices"][0]['text'].replace("RESPONSE:", "")
 
 
 def tts(text:str):
