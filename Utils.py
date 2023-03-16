@@ -70,12 +70,12 @@ class Recorder:
 
     # This method is used to transcribe information from the specified filename
 
-    def transcribe() -> str:
-        """Transcribes the audio file into text"""
-        print("Thinking about how to respond...")
-        with open(filename, 'rb') as fp:
-            transcript = openai.Audio.transcribe("whisper-1", fp)
-            return transcript['text'].strip()
+def transcribe() -> str:
+    """Transcribes the audio file into text"""
+    print("Thinking about how to respond...")
+    with open(filename, 'rb') as fp:
+        transcript = openai.Audio.transcribe("whisper-1", fp)
+        return transcript['text'].strip()
 
 def tts(text:str):
     """Speaks out the given speech"""
@@ -108,6 +108,7 @@ def load_config() -> dict:
         return load(fp, Loader)["CONFIG"]
     
 def model_check(prev:str):
+    if prev == "text": return prev
     tts("Testing Network speed")
     st = Speedtest()
     if st.download() / (1024 * 1024) < 30 and prev != "text":
