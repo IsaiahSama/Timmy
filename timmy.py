@@ -1,6 +1,7 @@
 import Utils, openai
 
 from openai.error import Timeout, RateLimitError
+from keyboard import wait
 
 DISCLAIMER = "You will only respond to anything under the 'QUERY:' header."
 
@@ -14,13 +15,18 @@ class Timmy:
     clear = ""
 
     def __init__(self) -> None:
+        print("Setting up")
         self.recorder = Utils.Recorder()
         self.text = ""
         self.role = "You're an assistant. Be helpful!"
         self.context = [self.role]
         self.model = 'chat'
         self.clear = "Clear history"
+        self.record_key = 'x'
+        self.process_key = 'c'
         self.setup()
+        print("Ready!")
+
 
     def setup(self):
         try:
@@ -29,15 +35,19 @@ class Timmy:
             self.context = [self.role]
             self.voice = config["VOICE"]
             self.model = config["MODELS"][config["MODEL"]]
+            self.record_key = config["RECORDKEY"]
+            self.process_key = config["PROCESSKEY"]
         except FileNotFoundError:
             print("Could not find config file `config.yaml`")
         except KeyError as e:
             print("One of the fields I was looking for do not exist. Everything else has been set.\n", str(e))
 
         self.model = Utils.model_check(self.model)
+        Utils.tts("I'm ready now. Press " + self.record_key + " for me to listen, and press "+ self.process_key + " when you're finished speaking.")
 
 
     def listen(self):
+        wait('x')
         if self.recorder.recording: return False
         self.recorder.recording = True
         frames = self.recorder.record()
@@ -58,7 +68,7 @@ class Timmy:
             self.clear_context()
             self.text = self.text.lower().replace(self.clear, "")
 
-        Utils.tts("I heard: ", self.text)
+        Utils.tts("I heard: " + self.text)
         if len(self.context) >= 21: self.clear_context()
 
     def prompt_api(self):
