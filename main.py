@@ -1,43 +1,72 @@
 # Basic  Structure of Program:
 import Utils
+from keyboard import add_hotkey, wait
+from time import sleep
 
 # Step 1, Run the program and LOOP!
 
-text = ""
-prev_text = ""
+role = "assistant"
+DEFAULT_CONTEXT = [
+    role,
+    "You are role-playing as an amazing assistant named Timmy. Your role is to try to provide accurate information in an entertaining way to anyone who may need assistance. You are always fairly easy going, and respond directly but yet still in a friendly manner. You were developed by Isaiah Carrington, and are powered by Open Ai. You will only respond to anything under the 'QUERY:' header."
+    ]
+context = DEFAULT_CONTEXT[:]
 
-r = Utils.prompt("Introduce yourself.")
-Utils.tts(r)
 
 FILLER = "Only respond to everything after this sentence."
-CLEAR = "clear conversation history"
+CLEAR = "Clear conversation history"
 
-while ("goodbye" not in text.lower()):
-    # Step 2, record x seconds worth of audio
-    prev_text = prev_text.replace(FILLER, "")
-    rc = Utils.Recorder(7)
+class Timmy:
+    text = ""
+    prev_text = ""
 
-    frames = rc.record()
+    def __init__(self) -> None:
+        self.text = ""
+        self.prev_text = ""
+        self.recorder = Utils.Recorder()
 
-    # Step 3, save the audio to a file
-    rc.save_frames(frames)
+    def listen(self):
+        if self.recorder.recording: return False
+        self.recorder.recording = True
+        frames = self.recorder.record()
+        self.recorder.save_frames(frames)
+        self.transcribe()
+        context.append(self.text)
+        self.prompt_api()
 
-    # Step 4, transcribe the audio from the file to text
-    text = Utils.transcribe()
-    if not text or "timmy" not in text.lower(): continue
-    if CLEAR in text.lower(): 
-        prev_text = ""
-        text = text.replace(CLEAR, "")
-        
-    print("I heard: ", text)
-    prev_text += ". "+ FILLER + text
-    if len(prev_text) >= 1500: prev_text = ""
+    def stop_listening(self):
+        self.recorder.recording = False
+        print("Processing")
 
-    # Step 5, pass the text to the AI if there is text
-    # Step 6, let the magic happen
-    # Step 7, save the response
-    response = Utils.prompt(prev_text)
+    def transcribe(self):
+        self.text = Utils.transcribe()
+        if not self.text: return False
+        if CLEAR in self.text.lower(): 
+            self.clear_context()
+            self.text = self.text.replace(CLEAR, "")
 
-    # Step 8, Read out the response.
+        print("I heard: ", self.text)
+        if len(context) >= 21: self.clear_context()
 
-    Utils.tts(response)
+    def prompt_api(self):
+        response = Utils.prompt(context)
+        # Step 8, Read out the response.
+        Utils.tts(response)
+
+    def clear_context(self):
+        context.clear()
+        context = DEFAULT_CONTEXT[:]
+
+
+
+if __name__ == "__main__":
+    running = True
+    timmy = Timmy()
+
+    Utils.tts(Utils.prompt([*context, "Introduce yourself"]))
+
+    # add_hotkey("x", timmy.listen)
+
+    while running:
+        wait('x')
+        timmy.listen()
