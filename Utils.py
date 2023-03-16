@@ -3,10 +3,10 @@
 import pyaudio, wave, pyttsx3
 import openai, os
 
-from openai.error import Timeout, RateLimitError
-
 from dotenv import load_dotenv
 from keyboard import is_pressed
+
+from yaml import load
 
 testing = True
 
@@ -63,56 +63,14 @@ class Recorder:
         wf.writeframes(b''.join(frames))
         wf.close()
 
-# This method is used to transcribe information from the specified filename
+    # This method is used to transcribe information from the specified filename
 
-def transcribe() -> str:
-    """Transcribes the audio file into text"""
-    print("Thinking about how to respond...")
-    with open(filename, 'rb') as fp:
-        transcript = openai.Audio.transcribe("whisper-1", fp)
-        return transcript['text'].strip()
-
-
-def prompt(context:list) -> str:
-    """Prompts the text-davinci-003 model for a response given the recorded text"""
-    content = "CONTEXT:\n"+ "\n".join(context[1:-1]) + "\nQUERY:\n" + context[-1]
-    try:
-        if not testing:
-            response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role":'system', "content":context[0]},
-                        {"role":'user', "content":content},
-                        ], 
-                    temperature=1,
-                    request_timeout=20
-                )
-            print(content)
-
-        else:
-            raise Timeout
-    
-    except (Timeout, RateLimitError):
-        try:
-            print("The ChatCompletion model is occupied. Trying Completion model.")
-            temp = content.split('\n')
-            temp.insert(1, context[0])
-            content = '\n'.join(temp)
-            response = openai.Completion.create(
-                model="text-davinci-003", 
-                prompt=content, 
-                temperature=1,
-                request_timeout=40,
-                max_tokens=1000
-                )
-            print(content)
-        except (RateLimitError):
-            tts("My brain seems to be occupied doing other things. Very busy I am. Sorry. Try again later.")
-        except (Timeout):
-            tts("The wifi you're currently connected to is not good enough and the requests are taking too long.")
-
-    return response["choices"][0]['text'].replace("ANSWER:", "").replace("RESPONSE:", "")
-
+    def transcribe() -> str:
+        """Transcribes the audio file into text"""
+        print("Thinking about how to respond...")
+        with open(filename, 'rb') as fp:
+            transcript = openai.Audio.transcribe("whisper-1", fp)
+            return transcript['text'].strip()
 
 def tts(text:str):
     """Speaks out the given speech"""
@@ -136,3 +94,9 @@ def tts(text:str):
 
 def clean_up_text_for_speech(text:str):
     return text.replace("|", ".").replace("-", "")
+
+def contextify(ctx:list, include_role:bool=False):
+    return "CONTEXT:\n"+ "\n".join(ctx[1 if include_role else 0:-1]) + "\nQUERY:\n" + ctx[-1]
+
+def load_config() -> dict:
+    return load("data.yaml")["CONFIG"]
