@@ -29,6 +29,7 @@ class Timmy:
         if self.recorder.recording: return False
         self.recorder.recording = True
         frames = self.recorder.record()
+        if not [f.strip() for f in frames]: return
         self.recorder.save_frames(frames)
         self.transcribe()
         context.append(self.text)
@@ -64,8 +65,6 @@ if __name__ == "__main__":
     timmy = Timmy()
 
     Utils.tts(Utils.prompt([*context, "Introduce yourself"]))
-
-    # add_hotkey("x", timmy.listen)
 
     while running:
         wait('x')
