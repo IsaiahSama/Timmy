@@ -5,8 +5,13 @@ import openai, os
 
 from dotenv import load_dotenv
 from keyboard import is_pressed
+from speedtest import Speedtest
 
 from yaml import load
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 testing = True
 
@@ -99,4 +104,13 @@ def contextify(ctx:list, include_role:bool=False):
     return "CONTEXT:\n"+ "\n".join(ctx[1 if include_role else 0:-1]) + "\nQUERY:\n" + ctx[-1]
 
 def load_config() -> dict:
-    return load("data.yaml")["CONFIG"]
+    with open("config.yaml") as fp:
+        return load(fp, Loader)["CONFIG"]
+    
+def model_check(prev:str):
+    tts("Testing Network speed")
+    st = Speedtest()
+    if st.download() / (1024 * 1024) < 30 and prev != "text":
+        tts("Your network speed is limited. Switching to a different model!")
+        return "text"
+    return 'chat'

@@ -34,7 +34,7 @@ class Timmy:
         except KeyError as e:
             print("One of the fields I was looking for do not exist. Everything else has been set.\n", str(e))
 
-        self.model = Utils.model_check()
+        self.model = Utils.model_check(self.model)
 
 
     def listen(self):
