@@ -53,9 +53,10 @@ class Timmy:
         frames = self.recorder.record()
         if not [f.strip() for f in frames]: return
         self.recorder.save_frames(frames)
-        self.transcribe()
-        self.context.append(self.text)
-        self.prompt_api()
+        if self.transcribe():
+            self.context.append(self.text)
+            Utils.tts("I heard: " + self.text)
+            self.prompt_api()
 
     def stop_listening(self):
         self.recorder.recording = False
@@ -63,13 +64,16 @@ class Timmy:
 
     def transcribe(self):
         self.text = Utils.transcribe()
-        if not self.text: return False
+        if not self.text.strip(): 
+            print("No actual text")
+            Utils.tts("I didn't hear anything...")
+            return False
         if self.clear.lower() in self.text.lower(): 
             self.clear_context()
             self.text = self.text.lower().replace(self.clear, "")
 
-        Utils.tts("I heard: " + self.text)
         if len(self.context) >= 21: self.clear_context()
+        return True
 
     def prompt_api(self):
         response = self.prompt()
@@ -109,7 +113,7 @@ class Timmy:
 
     def prompt(self) -> str:
         model = self.prompt_chat if self.model == "chat" else self.prompt_text
-
+        Utils.tts("Thinking...")
         try:
             return model()        
         except (RateLimitError):
