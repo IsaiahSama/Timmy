@@ -46,11 +46,15 @@ class Recorder:
         tts("I'm listening")
 
         # for i in range(0, int(self.sample_rate / self.chunk * self.record_seconds)):
+        counter = 0
         while not (is_pressed("c")):
+            if not( counter % 10): print('.', end='', flush=True)
+            counter += 1
             data = stream.read(self.chunk)
             frames.append(data)
         
-        print("Thinking...")
+        print("")
+        print("Attempting to understand what you said...")
         self.recording = False
         stream.stop_stream()
         stream.close()
@@ -72,7 +76,6 @@ class Recorder:
 
 def transcribe() -> str:
     """Transcribes the audio file into text"""
-    print("Thinking about how to respond...")
     with open(filename, 'rb') as fp:
         transcript = openai.Audio.transcribe("whisper-1", fp)
         return transcript['text'].strip()
