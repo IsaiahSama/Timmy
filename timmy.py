@@ -79,13 +79,13 @@ class Timmy:
         response = self.prompt()
         if not response: return False
         # Step 8, Read out the response.
-        Utils.Utils.tts(response)
+        Utils.tts(response)
 
     def clear_context(self):
         self.context.clear()
         self.context = [self.role]
 
-    def prompt_chat(self):
+    def prompt_chat(self) ->str:
         # Prompts the gpt-3.5-turbo model. Not recommended for slow networks.
         content = Utils.contextify(self.context)
         response = openai.ChatCompletion.create(
@@ -99,7 +99,7 @@ class Timmy:
             )
         return response["choices"][0]["message"]['content'].replace("RESPONSE:", "")
 
-    def prompt_text(self):
+    def prompt_text(self) ->str:
         """Prompts the text-davinci-003 model for a response given the recorded text"""
         content = Utils.contextify(self.context, True)
         response = openai.Completion.create(
@@ -109,17 +109,17 @@ class Timmy:
             request_timeout=40,
             max_tokens=1000
             )
-        return response["choices"][0]['text'].replace("ANSWER:", "")
+        return response["choices"][0]['text'].replace("RESPONSE:", "")
 
     def prompt(self) -> str:
         model = self.prompt_chat if self.model == "chat" else self.prompt_text
         Utils.tts("Thinking...")
         try:
-            return model()        
+            return model()     
         except (RateLimitError):
             Utils.tts("My brain seems to be occupied doing other things. Very busy I am. Sorry. Try again later.")
+            return ""
         except (Timeout):
             Utils.tts("The wifi you're currently connected to is not good enough and the requests are taking too long.")
-        finally:
             return ""
 
