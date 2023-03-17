@@ -6,6 +6,9 @@ import openai, os
 from dotenv import load_dotenv
 from keyboard import is_pressed
 from speedtest import Speedtest
+from PIL import Image
+from time import sleep
+from threading import Thread
 
 from yaml import load
 try:
@@ -72,8 +75,40 @@ class Recorder:
         wf.writeframes(b''.join(frames))
         wf.close()
 
-    # This method is used to transcribe information from the specified filename
+class State:
+    state = ""
+    path = ""
 
+    def __init__(self, state:str, path:str):
+        self.state = state
+        self.path=path
+        self.setup()
+
+    def setup(self):
+        t = Thread(target=self.run, daemon=True)
+        t.start()
+
+    def get_path(self):
+        return self.path + self.state
+    
+    def change_state(self, state:str):
+        self.state = state
+
+    def run(self):
+        cur_path = None
+        image = None
+        while True:
+            if cur_path == self.get_path():
+                sleep(0.5)
+                continue 
+            if image:
+                image.close()
+            cur_path = self.get_path()
+            image = Image.open(cur_path)
+            image.show()
+
+
+# This method is used to transcribe information from the specified filename
 def transcribe() -> str:
     """Transcribes the audio file into text"""
     with open(filename, 'rb') as fp:

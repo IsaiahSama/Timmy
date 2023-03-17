@@ -11,3 +11,9 @@ CONFIG:
   MODEL: TEXTCOMPLETION
   RECORDKEY: x # Key to press to begin recording.
   PROCESSKEY: c # Key to press to stop recording.
+  STATES:
+    PATH: "./States" # This is the path where all states will be stored
+    SLEEPING: "sleeping"
+    THINKING: "thinking"
+    TALKING: "talking"
+  STATE: SLEEPING
