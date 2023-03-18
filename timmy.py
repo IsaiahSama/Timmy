@@ -1,4 +1,4 @@
-import Utils, openai
+import Utils, openai, State
 
 from openai.error import Timeout, RateLimitError
 from keyboard import wait
@@ -54,7 +54,7 @@ class Timmy:
             print("One of the fields I was looking for do not exist. Everything else has been set.\n", str(e))
 
         self.model = Utils.model_check(self.model)
-        self.state_manager = Utils.State(self.state, self.path)
+        self.state_manager = State.State(self.state, self.path)
         self.speak("I'm ready now. Press " + self.record_key + " for me to listen, and press "+ self.process_key + " when you're finished speaking.")
 
 
