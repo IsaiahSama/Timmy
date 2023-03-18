@@ -3,6 +3,8 @@
 import pyaudio, wave, pyttsx3
 import openai, os
 
+from os import listdir
+
 from dotenv import load_dotenv
 from keyboard import is_pressed
 from speedtest import Speedtest
@@ -98,15 +100,18 @@ class State:
         cur_path = None
         image = None
         while True:
-            if cur_path == self.get_path():
-                sleep(0.5)
-                continue 
-            if image:
-                image.close()
-            cur_path = self.get_path()
-            image = Image.open(cur_path)
-            image.show()
+            if cur_path == self.get_path(): 
+                sleep(0)
+                continue
 
+            cur_path = self.get_path()
+            files = listdir(cur_path)
+            for file in files:
+                with Image.open(cur_path+file) as image:
+                    width, height = image.size
+                    image = image.resize((width*2, height*2), resample=Image.BICUBIC)
+                    # Show the upsized image
+                    image.show()
 
 # This method is used to transcribe information from the specified filename
 def transcribe() -> str:

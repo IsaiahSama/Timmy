@@ -17,7 +17,6 @@ class Timmy:
     def __init__(self) -> None:
         print("Setting up")
         self.recorder = Utils.Recorder()
-        self.state_manager = Utils.State()
         self.text = ""
         self.role = "You're an assistant. Be helpful!"
         self.context = [self.role]
@@ -27,11 +26,12 @@ class Timmy:
         self.process_key = 'c'
         self.state = "sleeping"
         self.states = {
-            "SLEEPING": "sleeping.png",
-            "TALKING": "talking.png",
-            "THINKING": "thinking.png"
+            "SLEEPING": "Sleeping/",
+            "TALKING": "Talking/",
+            "THINKING": "Thinking/", 
+            "LISTENING": "Listening/"
         }
-        self.path = "./States"
+        self.path = "./States/"
         self.setup()
         print("Ready!")
 
@@ -96,6 +96,7 @@ class Timmy:
         # Step 8, Read out the response.
 
         self.speak(response)
+        self.clear_context()
 
     def speak(self, text:str):
         self.state_manager.change_state(self.states["TALKING"])
