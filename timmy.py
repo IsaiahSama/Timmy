@@ -65,6 +65,7 @@ class Timmy:
         self.state_manager.change_state(self.states["LISTENING"])
         frames = self.recorder.record()
         if not [f.strip() for f in frames]: return
+        self.state_manager.change_state(self.states["THINKING"])
         self.recorder.save_frames(frames)
         if self.transcribe():
             self.context.append(self.text)
@@ -89,8 +90,8 @@ class Timmy:
         return True
 
     def prompt_api(self):
-        self.state_manager.change_state(self.states["THINKING"])
         self.speak("Thinking...")
+        self.state_manager.change_state(self.states["WAKING"])
         response = self.prompt()
         if not response: return False
         # Step 8, Read out the response.

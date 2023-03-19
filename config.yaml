@@ -17,4 +17,5 @@ CONFIG:
     THINKING: "Thinking/"
     TALKING: "Talking/"
     LISTENING: "Listening/"
+    WAKING: "Waking/"
   STATE: TALKING

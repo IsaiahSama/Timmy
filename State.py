@@ -47,7 +47,10 @@ class State:
                 frames = [pygame.image.load(cur_path+file) for file in files]
 
             # draw the current frame
-            window.blit(frames[frame_index], (0, 0))
+            try:
+                window.blit(frames[frame_index], (0, 0))
+            except IndexError:
+                frame_index = 0
 
             # update the frame index based on the animation speed
             if pygame.time.get_ticks() - animation_timer > animation_speed:
