@@ -1,5 +1,5 @@
 # Basic  Structure of Program:
-from Timmy import Timmy
+from timmy import Timmy
 
 if __name__ == "__main__":
     timmy = Timmy()

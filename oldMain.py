@@ -1,5 +1,5 @@
 # Basic  Structure of Program:
-import Utils
+import utils
 import keyboard
 
 # Step 1, Run the program and LOOP!
@@ -7,8 +7,8 @@ import keyboard
 text = ""
 prev_text = ""
 
-r = Utils.prompt("Introduce yourself.")
-Utils.tts(r)
+r = utils.prompt("Introduce yourself.")
+utils.tts(r)
 
 FILLER = "Only respond to everything after this sentence."
 CLEAR = "clear conversation history"
@@ -16,7 +16,7 @@ CLEAR = "clear conversation history"
 while ("goodbye" not in text.lower()):
     # Step 2, record x seconds worth of audio
     prev_text = prev_text.replace(FILLER, "")
-    rc = Utils.Recorder(7)
+    rc = utils.Recorder(7)
 
     frames = rc.record()
 
@@ -24,7 +24,7 @@ while ("goodbye" not in text.lower()):
     rc.save_frames(frames)
 
     # Step 4, transcribe the audio from the file to text
-    text = Utils.transcribe()
+    text = utils.transcribe()
     if not text or "timmy" not in text.lower(): continue
     if CLEAR in text.lower(): 
         prev_text = ""
@@ -37,8 +37,8 @@ while ("goodbye" not in text.lower()):
     # Step 5, pass the text to the AI if there is text
     # Step 6, let the magic happen
     # Step 7, save the response
-    response = Utils.prompt(prev_text)
+    response = utils.prompt(prev_text)
 
     # Step 8, Read out the response.
 
-    Utils.tts(response)
+    utils.tts(response)

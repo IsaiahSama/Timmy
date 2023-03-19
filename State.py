@@ -1,5 +1,5 @@
 from threading import Thread
-from os import listdir, get_terminal_size
+from os import listdir
 from time import sleep
 
 import pygame

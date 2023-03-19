@@ -1,4 +1,4 @@
-import Utils, openai, State
+import utils, openai, state
 
 from openai.error import Timeout, RateLimitError
 from keyboard import wait
@@ -16,7 +16,7 @@ class Timmy:
 
     def __init__(self) -> None:
         print("Setting up")
-        self.recorder = Utils.Recorder()
+        self.recorder = utils.Recorder()
         self.text = ""
         self.role = "You're an assistant. Be helpful!"
         self.context = [self.role]
@@ -38,7 +38,7 @@ class Timmy:
 
     def setup(self):
         try:
-            config = Utils.load_config()
+            config = utils.load_config()
             self.role = config["ROLES"][config["ROLE"]]
             self.context = [self.role]
             self.voice = config["VOICE"]
@@ -53,8 +53,8 @@ class Timmy:
         except KeyError as e:
             print("One of the fields I was looking for do not exist. Everything else has been set.\n", str(e))
 
-        self.model = Utils.model_check(self.model)
-        self.state_manager = State.State(self.state, self.path)
+        self.model = utils.model_check(self.model)
+        self.state_manager = state.State(self.state, self.path)
         self.speak("I'm ready now. Press " + self.record_key + " for me to listen, and press "+ self.process_key + " when you're finished speaking.")
 
 
@@ -77,7 +77,7 @@ class Timmy:
         print("Processing")
 
     def transcribe(self):
-        self.text = Utils.transcribe()
+        self.text = utils.transcribe()
         if not self.text.strip(): 
             print("No actual text")
             self.speak("I didn't hear anything...")
@@ -101,7 +101,7 @@ class Timmy:
 
     def speak(self, text:str):
         self.state_manager.change_state(self.states["TALKING"])
-        Utils.tts(text)
+        utils.tts(text)
         self.state_manager.change_state(self.states["SLEEPING"])
 
 
@@ -111,7 +111,7 @@ class Timmy:
 
     def prompt_chat(self) ->str:
         # Prompts the gpt-3.5-turbo model. Not recommended for slow networks.
-        content = Utils.contextify(self.context)
+        content = utils.contextify(self.context)
         response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -125,7 +125,7 @@ class Timmy:
 
     def prompt_text(self) ->str:
         """Prompts the text-davinci-003 model for a response given the recorded text"""
-        content = Utils.contextify(self.context, True)
+        content = utils.contextify(self.context, True)
         response = openai.Completion.create(
             model="text-davinci-003", 
             prompt=content, 
