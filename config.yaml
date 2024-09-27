@@ -8,7 +8,8 @@ CONFIG:
   MODELS:
     CHATCOMPLETION: "chat"
     TEXTCOMPLETION: "text"
-  MODEL: TEXTCOMPLETION
+    GEMINI: "gemini"
+  MODEL: GEMINI
   RECORDKEY: x # Key to press to begin recording.
   PROCESSKEY: c # Key to press to stop recording.
   STATES:

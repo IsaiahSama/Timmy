@@ -3,7 +3,6 @@
 import pyaudio, wave, pyttsx3
 import openai, os
 
-from dotenv import load_dotenv
 from keyboard import is_pressed
 from speedtest import Speedtest
 
@@ -12,12 +11,12 @@ try:
     from yaml import CLoader as Loader
 except ImportError:
     from yaml import Loader
+    
+
+import speech_recognition as sr
+from os import system, path, remove
 
 testing = True
-
-load_dotenv()
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Gotta store the filename
 filename = "output.wav"
@@ -37,7 +36,7 @@ class Recorder:
         self.record_seconds = record_seconds
         self.filename = filename
 
-    def record(self) -> list:
+    def record(self, process_key:str) -> list:
         """This function will record record_seconds number of seconds worth of audio"""
         audio = pyaudio.PyAudio()
         stream = audio.open(format=pyaudio.paInt16, channels=self.channels, rate=self.sample_rate, input=True, frames_per_buffer=self.chunk)
@@ -47,7 +46,7 @@ class Recorder:
 
         # for i in range(0, int(self.sample_rate / self.chunk * self.record_seconds)):
         counter = 0
-        while not (is_pressed("c")):
+        while not (is_pressed(process_key)):
             if not( counter % 10): print('.', end='', flush=True)
             counter += 1
             data = stream.read(self.chunk)
@@ -74,11 +73,29 @@ class Recorder:
 
 
 # This method is used to transcribe information from the specified filename
-def transcribe() -> str:
+def old_transcribe() -> str:
     """Transcribes the audio file into text"""
     with open(filename, 'rb') as fp:
         transcript = openai.Audio.transcribe("whisper-1", fp)
         return transcript['text'].strip()
+    
+def transcribe() -> str:
+        # system(fr"ffmpeg -i {filename} ./audios/output.wav")
+
+        r = sr.Recognizer()
+        with sr.AudioFile(filename) as source:
+            audio = r.record(source)
+
+        text = ""
+        try:
+            text =  r.recognize_google(audio)
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+            return {"error": "Audio could not be understood. Try again"}
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+            return {"error": e}
+        return text.strip()
 
 def tts(text:str):
     """Speaks out the given speech"""

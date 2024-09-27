@@ -1,9 +1,13 @@
 import utils, state
+from threading import Thread
 
 import openai
-from openai import Timeout, RateLimitError
+from openai import APITimeoutError, RateLimitError
 
 from keyboard import wait
+from llm import models
+
+import pygame
 
 DISCLAIMER = "You will only respond to anything under the 'QUERY:' header."
 
@@ -34,11 +38,10 @@ class Timmy:
             "LISTENING": "Listening/"
         }
         self.path = "./States/"
-        self.setup()
-        print("Ready!")
+        self.config_setup()
 
 
-    def setup(self):
+    def config_setup(self):
         try:
             config = utils.load_config()
             self.role = config["ROLES"][config["ROLE"]]
@@ -55,17 +58,18 @@ class Timmy:
         except KeyError as e:
             print("One of the fields I was looking for do not exist. Everything else has been set.\n", str(e))
 
-        self.model = utils.model_check(self.model)
+        # self.model = utils.model_check(self.model)
         self.state_manager = state.State(self.state, self.path)
-        self.speak("I'm ready now. Press " + self.record_key + " for me to listen, and press "+ self.process_key + " when you're finished speaking.")
-
+        print("Config Complete")
+        self.speak("Hey there! Press " + self.record_key + " for me to listen, and press "+ self.process_key + " when you're finished speaking.")
 
     def listen(self):
-        wait('x')
+        print("Press " + self.record_key + " when ready")
+        wait(self.record_key)
         if self.recorder.recording: return False
         self.recorder.recording = True
         self.state_manager.change_state(self.states["LISTENING"])
-        frames = self.recorder.record()
+        frames = self.recorder.record(self.process_key)
         if not [f.strip() for f in frames]: return
         self.state_manager.change_state(self.states["THINKING"])
         self.recorder.save_frames(frames)
@@ -80,7 +84,7 @@ class Timmy:
 
     def transcribe(self):
         self.text = utils.transcribe()
-        if not self.text.strip(): 
+        if not self.text: 
             print("No actual text")
             self.speak("I didn't hear anything...")
             return False
@@ -106,45 +110,23 @@ class Timmy:
         utils.tts(text)
         self.state_manager.change_state(self.states["SLEEPING"])
 
-
     def clear_context(self):
         self.context.clear()
         self.context = [self.role]
 
-    def prompt_chat(self) ->str:
-        # Prompts the gpt-3.5-turbo model. Not recommended for slow networks.
-        content = utils.contextify(self.context)
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role":'system', "content":self.context[0]},
-                    {"role":'user', "content":content},
-                    ], 
-                temperature=1,
-                request_timeout=30
-            )
-        return response["choices"][0]["message"]['content'].replace("RESPONSE:", "")
-
-    def prompt_text(self) ->str:
-        """Prompts the text-davinci-003 model for a response given the recorded text"""
-        content = utils.contextify(self.context, True)
-        response = openai.Completion.create(
-            model="text-davinci-003", 
-            prompt=content, 
-            temperature=1,
-            request_timeout=40,
-            max_tokens=1000
-            )
-        return response["choices"][0]['text'].replace("RESPONSE:", "")
-
     def prompt(self) -> str:
-        model = self.prompt_chat if self.model == "chat" else self.prompt_text
+
+        model = models[self.model]
         try:
-            return model()     
+            return model(self.context)     
         except (RateLimitError):
             self.speak("My brain seems to be occupied doing other things. Very busy I am. Sorry. Try again later.")
             return ""
-        except (Timeout):
+        except (APITimeoutError):
             self.speak("The wifi you're currently connected to is not good enough and the requests are taking too long.")
+            return ""
+        except Exception as e:
+            self.speak("Something went wrong. Try again later.")
+            print(e)
             return ""
 

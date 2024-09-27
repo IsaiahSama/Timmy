@@ -7,6 +7,12 @@ name = "pypi"
 pygame = "*"
 keyboard = "*"
 openai = "*"
+requests = "*"
+pyyaml = "*"
+speedtest-cli = "*"
+pyttsx3 = "*"
+pyaudio = "*"
+speechrecognition = "*"
 
 [dev-packages]
 
