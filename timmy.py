@@ -1,6 +1,8 @@
-import utils, openai, state
+import utils, state
 
-from openai.error import Timeout, RateLimitError
+import openai
+from openai import Timeout, RateLimitError
+
 from keyboard import wait
 
 DISCLAIMER = "You will only respond to anything under the 'QUERY:' header."
