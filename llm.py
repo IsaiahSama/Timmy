@@ -5,8 +5,11 @@ import openai
 from typing import List
 from requests import post
 from json import dumps
+from dotenv import load_dotenv 
 
-gemini_key = os.environ.get("GEMINI_API_KEY")
+load_dotenv()
+
+gemini_key = os.getenv("GEMINI_API_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class Model:
