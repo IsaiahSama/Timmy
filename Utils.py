@@ -107,7 +107,7 @@ def tts(text:str):
     engine.runAndWait()
 
     # Set the rate
-    engine.setProperty('rate', 170)
+    engine.setProperty('rate', 200)
     # Set the volume
     engine.setProperty('volume', 1.0)
 
