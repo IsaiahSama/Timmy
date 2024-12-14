@@ -11,3 +11,6 @@ From here, you can run `python main.py` or `python3 main.py` to get started. Hav
 
 ## Installing other voices
 https://puneet166.medium.com/how-to-added-more-speakers-and-voices-in-pyttsx3-offline-text-to-speech-812c83d14c13
+
+## My Medium Post
+I recently created a post on Medium that goes into my thought process and implementation when creating this, so feel free to give that a read and some claps as well if you enjoy 😄. [Timmy The AI Assistant](https://github.com/IsaiahSama/Timmy).
